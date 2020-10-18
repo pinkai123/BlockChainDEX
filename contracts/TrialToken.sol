@@ -3,7 +3,7 @@ pragma solidity ^0.6.10;
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 /**
- * @dev Example of the ERC20 Token.
+ * @dev Example of the ERC20 Token.1234444
  */
 contract TrialToken is ERC20 {
 
