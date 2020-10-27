@@ -5,7 +5,7 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 /**
  * @dev Example of the ERC20 Token.
  */
-contract TrialToken is ERC20 {
+contract KumaToken is ERC20 {
 
 	using SafeMath for uint256;
 
@@ -14,7 +14,7 @@ contract TrialToken is ERC20 {
 
 	constructor()
 		public
-		ERC20('SampleToken', 'TRIAL')
+		ERC20('KumaToken', 'KUMA')
 	{
 		_mint(msg.sender, TOTALSUPPLY);
 	}
