@@ -45,6 +45,9 @@ contract ExchangePair{
     Order[] public sellorderList;
 
 	constructor (address _tokenA_address, address _tokenB_address) public {
+		//   KUMA/TRIAL
+		// TokenA = KUMA
+		//TokenB = TRIAL
 		tokenA_address = _tokenA_address;
 		tokenA = ERC20(_tokenA_address);
 		tokenA_symbol = tokenA.symbol();
@@ -64,6 +67,12 @@ contract ExchangePair{
     }
 	function getTokenB() public view returns (ERC20) {
         return tokenB;
+    }
+	function getTokenA_address() public view returns (address) {
+        return tokenA_address;
+    }
+	function getTokenB_address() public view returns (address) {
+        return tokenB_address;
     }
 	function getTokenA_symbol() public view returns (string memory) {
         return tokenA_symbol;
@@ -225,65 +234,39 @@ contract ExchangePair{
 		}
 	}
 
-	function uintToString(uint _i) internal pure returns (string memory str) {
-		if (_i == 0) {
-			return "0";
-		}
-		uint j = _i;
-		uint len;
-		while (j != 0) {
-			len++;
-			j /= 10;
-		}
-		bytes memory bstr = new bytes(len);
-		uint k = len - 1;
-		while (_i != 0) {
-			bstr[k--] = byte(uint8(48 + _i % 10));
-			_i /= 10;
-		}
-		return string(bstr);
-    }
-
-	function addressToString(address _pool) public pure returns (string memory _uintAsString) {
-		uint _i = uint256(_pool);
-		if (_i == 0) {
-			return "0";
-		}
-		uint j = _i;
-		uint len;
-		while (j != 0) {
-			len++;
-			j /= 10;
-		}
-		bytes memory bstr = new bytes(len);
-		uint k = len - 1;
-		while (_i != 0) {
-			bstr[k--] = byte(uint8(48 + _i % 10));
-			_i /= 10;
-		}
-		return string(bstr);
-	}
 
 	function getidList(address _owner_address) public view returns (uint[] memory){
 		uint size = getListsize();
 		uint[] memory idList = new uint[](size);
+		uint Size = 0;
 		for (uint j=0; j < buyorderList.length; j++) {
 			if (buyorderList[j].owner_Address == _owner_address){
-				idList[idList.length-1] = buyorderList[j].id;
+				uint _id = buyorderList[j].id;
+				idList[Size] = _id;
+				Size++;
 			}
 		}
 		for (uint j=0; j < sellorderList.length; j++) {
 			if (sellorderList[j].owner_Address == _owner_address){
-				idList[idList.length-1] = sellorderList[j].id;
+				uint _id = sellorderList[j].id;
+				idList[Size] = _id;
+				Size++;
 			}
 		}
-		return idList;
+		uint TempidList_size = 0;
+		uint[] memory TempidList = new uint[](Size);
+		for (uint k=0; k < Size; k++) {
+				uint _id = idList[k];
+				TempidList[TempidList_size] = _id;
+				TempidList_size++;
+		}
+		return TempidList;
 	}
 
 	function getPercentage(uint _id) public view returns (uint){
 		bool locate = false;
 		Order memory order;
-		//string[] memory Stringorder = new string[](4);
+
 		for (uint j=0; j < buyorderList.length; j++) {
 			if (_id == buyorderList[j].id){
 				order = buyorderList[j];
@@ -304,17 +287,12 @@ contract ExchangePair{
 			// No id. Assume that order is already filled and remove from orderList //
 			return 100;
 		}
-		// Stringorder.push(uintToString(order.id));
-		// Stringorder.push(addressToString(order.address));
-		// Stringorder.push(uintToString(order.tokenA_original_Amount));
-		// Stringorder.push(uintToString(order.percentage_fill));
 
 		return order.percentage_fill;
 	}
 	function getexchangeRate(uint _id) public view returns (uint){
 		bool locate = false;
 		Order memory order;
-		//string[] memory Stringorder = new string[](4);
 		for (uint j=0; j < buyorderList.length; j++) {
 			if (_id == buyorderList[j].id){
 				order = buyorderList[j];
@@ -331,10 +309,6 @@ contract ExchangePair{
 				}
 			}
 		}
-		// Stringorder.push(uintToString(order.id));
-		// Stringorder.push(addressToString(order.address));
-		// Stringorder.push(uintToString(order.tokenA_original_Amount));
-		// Stringorder.push(uintToString(order.percentage_fill));
 
 		return order.exchange/1000;
 	}
@@ -343,13 +317,12 @@ contract ExchangePair{
 contract DEX{
 	mapping(bytes32 => ExchangePair) public Exchange;
 	bytes32[] public PairArray;
-	uint[] TestArray;
 	string name;
 
 	event Done(string smth);
 
 	constructor() public {
-		name = "KKS";
+		name = "The Exchangers";
 	}
 
 	function addPair(bytes32 symbolPair,address tokenA_address, address tokenB_address) public payable{
@@ -360,23 +333,12 @@ contract DEX{
 	function addOrder(bytes32 symbolPair,address owner_address,uint256 tokenA_amount,uint256 tokenB_amount, bool buy) public{
 		ExchangePair Pair = Exchange[symbolPair];
 		emit Done("Found Pair");
-
-		// if (buy){
-		// 	ERC20 TokenB = ERC20(Pair.getTokenB());
-		// 	TokenB.approve(address(this),tokenB_amount,{from:owner_address});
-		// }
-		// else{
-		// 	Pair.getTokenA().approve(address(this),tokenA_amount,{from:owner_address});
-		// }
-		 
 		Pair.addOrder(owner_address,tokenA_amount,tokenB_amount,buy);
 	}
 
 	function getidList(bytes32 symbolPair,address owner_address) public view returns (uint[] memory){
 		ExchangePair Pair = Exchange[symbolPair];
-		uint size = Pair.getListsize();
-		uint[] memory idList = new uint[](size)
-		;
+		uint[] memory idList;
 		idList = Pair.getidList(owner_address);
 		return idList;
 	}
@@ -404,6 +366,19 @@ contract DEX{
 	function getAddress(bytes32 symbolPair) public view returns (address){
 		ExchangePair Pair = Exchange[symbolPair];
 		address Address = address(Pair);
+		return Address;
+	}
+	function getPairArray() public view returns (bytes32[] memory){
+		return PairArray;
+	}
+	function getTokenA(bytes32 symbolPair) public view returns (address){
+		ExchangePair Pair = Exchange[symbolPair];
+		address Address = Pair.getTokenA_address();
+		return Address;
+	}
+	function getTokenB(bytes32 symbolPair) public view returns (address){
+		ExchangePair Pair = Exchange[symbolPair];
+		address Address = Pair.getTokenB_address();
 		return Address;
 	}
 
