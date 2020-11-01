@@ -127,7 +127,7 @@ class App extends React.Component {
         <h5>Bank Contract Address: {DexContractAddress}</h5>
         <h5>Network: {Testnet}</h5>
         <ul class="list-group mb-5">{this.state.PairArray}</ul>
-        <h5>Add ExhchangePair</h5>
+        <h5>Add ExchangePair</h5>
         <div class="form-row">
         <div class="col">
         <input
